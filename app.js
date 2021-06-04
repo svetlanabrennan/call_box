@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 
+let createRandomEndpoint = require("./lib/random")
+const { addEndpointToDB, pullRequests, addRequest } = require("./lib/db-query")
+
 //Loads the handlebars module
 const handlebars = require('express-handlebars');
 
@@ -14,7 +17,8 @@ app.engine('handlebars', handlebars({
 
 
 // connect to postgres database
-const { Client } = require('pg');
+// const { Client } = require('pg');
+
 const host = "localhost";
 const port = 3002;
 
@@ -23,25 +27,25 @@ const path = require("path")
 const publicPath = path.join(__dirname, '/public');
 app.use(express.static(publicPath));
 
+let endpoint;
 
 // read request body 
 const bodyParser = require('body-parser');
+// const addEndpointToDB = require("./lib/db-query");
 
 // connect to database
-const client = new Client({
-  user: 'sb',
-  host: 'localhost',
-  database: 'callbox',
-  password: 'password',
-  port: 5432,
-});
+// const client = new Client({
+//   user: 'sb',
+//   host: 'localhost',
+//   database: 'callbox',
+//   password: 'password',
+//   port: 5432,
+// });
 
-client.connect();
+// client.connect();
 
-let endpoint = ""
+// let endpoint = ""
 // created db called "callbox"
-
-let db = {}
 
 // created endpoints table
 // CREATE TABLE endpoints (
@@ -78,126 +82,147 @@ app.get('/', (req, res) => {
 })
 
 // create new request bin
-app.post('/new', (req, res) => {
-  endpoint = "fgfdfdf4564";
-  console.log("need to save this endpoint")
-  // send initial test event to this endpoint
-  // redirect to endpoint url
-  res.redirect(`/${endpoint}`)
+app.post('/new', async (req, res) => {
+  endpoint = createRandomEndpoint();
+  console.log(endpoint)
+  await addEndpointToDB(endpoint);
+  res.redirect(`/${endpoint}/inspect`)
 
   // insert endpointurl into endpoint db table
-  async function insertIntoDB() {
-    let date = new Date();
-    // implementing parameterized queries in the app code
-    let queryText = `INSERT INTO endpoints (created_at, name) VALUES ($1, $2)`;
-    let queryValues = [date, endpoint];
-    await client.query(queryText, queryValues);
-  }
+  // async function insertIntoDB() {
+  //   let date = new Date();
+  //   // implementing parameterized queries in the app code
+  //   let queryText = `INSERT INTO endpoints (created_at, name) VALUES ($1, $2)`;
+  //   let queryValues = [date, endpoint];
+  //   await client.query(queryText, queryValues);
+  // }
 
-  insertIntoDB()
+
 })
 
 
 // view the stored http requests to the endpoint
-app.get('/:name/inspect', (req, res) => {
+app.get('/:name/inspect', async (req, res) => {
   let endpointUrl = req.params.name
   let body = req.body
   let headers = req.headers
   let method = req.method
-  let result2;
+  // let result2;
   // console.log(endpointUrl)
   // console.log("body", body)
   // console.log("headers", headers)
   // console.log("method", method)
 
   // look up last 20 stored requests in db
-  async function pullRequests() {
-    // find id of endpoint
-    let queryText = `SELECT id FROM endpoints WHERE name = $1`;
-    let queryValues = [endpointUrl];
-    let result = await client.query(queryText, queryValues);
+  // async function pullRequests() {
+  //   // find id of endpoint
+  //   let queryText = `SELECT id FROM endpoints WHERE name = $1`;
+  //   let queryValues = [endpointUrl];
+  //   let result = await client.query(queryText, queryValues);
 
 
-    console.log("database result", result);
-    if (result.rowCount === 0) {
-      console.log("not found")
-      res.status(404).send("Endpoint not found")
-    }
+  //   console.log("database result", result);
+  //   if (result.rowCount === 0) {
+  //     console.log("not found")
+  //     res.status(404).send("Endpoint not found")
+  //   }
 
-    let endpointId = result.rows[0].id;
+  //   let endpointId = result.rows[0].id;
 
-    // implementing parameterized queries in the app code
-    let queryText2 = `SELECT content FROM requests WHERE endpoint_id = $1 ORDER BY created_at DESC LIMIT 20`;
-    let queryValues2 = [endpointId];
-    result2 = await client.query(queryText2, queryValues2);
-    // console.log("this is the result from select first item", result2.rows[0])
-    console.log("this is the result2", result2.rows[0])
-    res.render('main', { layout: 'index', request: result2.rows, path: endpointUrl });
+  //   // implementing parameterized queries in the app code
+  //   let queryText2 = `SELECT content FROM requests WHERE endpoint_id = $1 ORDER BY created_at DESC LIMIT 20`;
+  //   let queryValues2 = [endpointId];
+  //   result2 = await client.query(queryText2, queryValues2);
+  //   // console.log("this is the result from select first item", result2.rows[0])
+  //   console.log("this is the result2", result2.rows[0])
+  //   res.render('main', { layout: 'index', request: result2.rows, path: endpointUrl });
+  // }
+
+  let result = await pullRequests(endpointUrl);
+  if (!result) {
+    res.status(404).send("Endpoint not found")
   }
 
-  pullRequests();
+  res.render('main', { layout: 'index', request: result.rows, path: endpointUrl });
 
 })
 
+app.get("/:name", (req, res) => {
+  console.log("ip address is", req.ip)
+  res.send(req.ip)
+})
+
 // post http request to endpoint
-app.post("/:name", (req, res) => {
+app.post("/:name", async (req, res) => {
   // need to validate data before adding to database
-  console.log("these are params", req.query)
+  // console.log("these are params", req.query)
+
   // check if endpoint url exists in db
   let endpointUrl = req.params.name
   console.log("this is the endpoint", endpointUrl)
-  async function locateEndpoint() {
-    // implementing parameterized queries in the app code
-    let queryText = `SELECT id FROM endpoints WHERE name = $1`;
-    let queryValues = [endpointUrl];
-    let result = await client.query(queryText, queryValues);
+  // async function locateEndpoint() {
+  //   // implementing parameterized queries in the app code
+  //   let queryText = `SELECT id FROM endpoints WHERE name = $1`;
+  //   let queryValues = [endpointUrl];
+  //   let result = await client.query(queryText, queryValues);
 
 
-    console.log("database result", result);
+  //   console.log("database result", result);
 
-    // move this to catch statement for this route?
-    if (result.rowCount === 0) {
-      console.log("not found")
-      res.status(404).send("Endpoint not found")
-    }
+  //   // move this to catch statement for this route?
+  //   if (result.rowCount === 0) {
+  //     console.log("not found")
+  //     res.status(404).send("Endpoint not found")
+  //   }
 
-    let endpointId = result.rows[0].id;
-    let body = req.body
-    let headers = req.headers
-    let method = req.method
-    console.log(endpointUrl)
-    console.log("body", body)
-    console.log("headers", headers)
-    console.log("method", method)
-    db[endpointUrl] = [method, headers, body]
-    console.log(db)
+  //   let endpointId = result.rows[0].id;
+  //   let body = req.body
+  //   let headers = req.headers
+  //   let method = req.method
+  //   console.log(endpointUrl)
+  //   console.log("body", body)
+  //   console.log("headers", headers)
+  //   console.log("method", method)
+  //   db[endpointUrl] = [method, headers, body]
+  //   console.log(db)
 
-    let payload = {
-      method: method,
-      header: headers,
-      body: body
-    }
+  //   let payload = {
+  //     method: method,
+  //     header: headers,
+  //     body: body
+  //   }
 
-    jsonPayload = JSON.stringify(payload)
+  //   jsonPayload = JSON.stringify(payload)
 
-    console.log("json payload", jsonPayload)
+  //   console.log("json payload", jsonPayload)
 
-    // insert http data into db
-    async function saveRequest() {
-      let date = new Date();
+  //   // insert http data into db
+  //   async function saveRequest() {
+  //     let date = new Date();
 
-      // need to change this endpointID to match db lookup function above
-      // let endpointId = 1;
-      // implementing parameterized queries in the app code
-      let queryText = `INSERT INTO requests (endpoint_id, content, created_at) VALUES ($1, $2, $3)`;
-      let queryValues = [endpointId, jsonPayload, date];
-      await client.query(queryText, queryValues);
-    }
+  //     // need to change this endpointID to match db lookup function above
+  //     // let endpointId = 1;
+  //     // implementing parameterized queries in the app code
+  //     let queryText = `INSERT INTO requests (endpoint_id, content, created_at) VALUES ($1, $2, $3)`;
+  //     let queryValues = [endpointId, jsonPayload, date];
+  //     await client.query(queryText, queryValues);
+  //   }
 
-    saveRequest()
+  //   saveRequest()
+  // }
+
+  let body = req.body
+  let headers = req.headers
+  let method = req.method
+
+  let result = await addRequest(endpointUrl, method, headers, body);
+  console.log("result is", result)
+  if (!result) {
+    res.status(404).send("Endpoint not found")
   }
 
-  locateEndpoint();
+  res.status(200).send("Success")
+
 })
 
 app.get("*", (req, res) => {
