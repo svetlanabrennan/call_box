@@ -4,37 +4,60 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>My Awesome App</title>
+  <title>Call Box</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="stylesheet" href="/inspect.css" />
 </head>
 
 <body>
-  <h2>All Requests</h2>
-  <div>
-    <h3>Path is /{{path}}</h3>
-    {{#each request}}
-    <p class="headers">Headers</p>
-    <div class="request">
-      <p>Request method: {{this.content.method}}</p>
-      <p>Headers:</p>
-      {{#each this.content.header}}
-      <p> {{@key}}: {{this}}</p>
+  <section id="nav">
+    <a href="/">Call Box</a>
+  </section>
+
+  <section id="main">
+    <div>
+      {{#each request}}
+      <div class="request">
+        <div class="top">
+          <div class="method">
+            <p>{{../host}}</p>
+            <span class="method-inner">
+              <p class="key">{{this.content.method}} </p>
+              <p>/{{../path}}</p>
+            </span>
+          </div>
+          <div class="time">
+            {{this.created_at}}
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div class="body">
+            <p class="section-heading">BODY:</p>
+            {{#each this.content.body}}
+            <div class="key-value">
+              <p class="key">{{@key}}:</p>
+              <p class="value">{{this}}</p>
+            </div>
+            {{/each }}
+          </div>
+
+          <div class="headers">
+            <p class="section-heading">HEADERS:</p>
+            {{#each this.content.header}}
+            <div class="key-value">
+              <p class="key">{{@key}}:</p>
+              <p class="value">{{this}}</p>
+            </div>
+            {{!-- <p> {{@key}}: {{this}}</p> --}}
+            {{/each}}
+          </div>
+
+        </div>
+      </div>
       {{/each}}
-
-      {{#each this.content.body}}
-      <p>Body:</p>
-      {{this}}
-
-      <p>---------------</p>
     </div>
-
-    {{/each }}
-    {{/each}}
-  </div>
-
-
-
+  </section>
 </body>
 
 </html>

@@ -1,3 +1,111 @@
-.request {
+body {
+  margin: 0;
+}
+
+#main {
+  margin: 50px 125px;
+}
+
+#nav {
   background: lightgray;
+  padding: 5px;
+}
+
+#home {
+  text-align: center;
+}
+
+#banner {
+  font-size: 35px;
+}
+
+button {
+  background-color: green;
+  height: 50px;
+  border: none;
+  border-radius: 7px;
+  font-size: 16px;
+  color: white;
+  padding: 0 10px;
+  margin-top: 15px;
+  
+}
+
+#nav > a {
+  background-image: url("./phone.png");
+  background-repeat: no-repeat;
+  background-size: 45px 45px;
+  padding-left: 75px;
+  font-size: 40px;
+  margin: 20px 0 20px 50px;
+  text-decoration: none;
+  color: black;
+  line-height: 75px;
+}
+
+.top {
+  background: lightgray;
+  padding: 10px 15px;
+}
+
+.bottom {
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.request {
+  border: 1px solid rgb(222, 222, 222);
+  margin-bottom: 25px;
+}
+
+.method > p{
+  margin: 5px 0;
+}
+
+.method {
+  width: 40%;
+}
+
+.time {
+  vertical-align: top;
+  width: 59%;
+}
+
+.method-inner {
+  display: flex;
+  justify-content: left;
+}
+
+.method, .time {
+  display: inline-block;
+  padding-top: 10px;
+}
+
+.body {
+  width: 40%;
+}
+
+.headers {
+  width: 59%;
+}
+
+.body, .headers {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.key-value {
+  display: flex;
+  justify-content: left;
+}
+
+.key {
+  padding-right: 5px;
+  font-weight: bold;
+}
+
+.section-heading {
+  font-weight: 700;
+  color: rgb(104, 101, 101);
+  margin-bottom: 0;
 }
