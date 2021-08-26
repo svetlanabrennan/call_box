@@ -1,3 +1,7 @@
+html {
+  font-family: "Lato", "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+}
+
 body {
   margin: 0;
 }
@@ -7,7 +11,7 @@ body {
 }
 
 #nav {
-  background: lightgray;
+  background: #e4874c;
   padding: 5px;
 }
 
@@ -20,31 +24,32 @@ body {
 }
 
 button {
-  background-color: green;
+  background-color: #e4874c;
   height: 50px;
   border: none;
   border-radius: 7px;
   font-size: 16px;
   color: white;
-  padding: 0 10px;
+  padding: 5px 20px;
   margin-top: 15px;
-  
+  font-weight: bold;
 }
 
 #nav > a {
-  background-image: url("./phone.png");
+  background-image: url("./http.png");
   background-repeat: no-repeat;
   background-size: 45px 45px;
   padding-left: 75px;
   font-size: 40px;
-  margin: 20px 0 20px 50px;
+  font-weight: bold;
+  margin: 20px 0 20px 150px;
   text-decoration: none;
   color: black;
   line-height: 75px;
 }
 
 .top {
-  background: lightgray;
+  background: #e4874c;
   padding: 10px 15px;
 }
 
@@ -108,4 +113,22 @@ button {
   font-weight: 700;
   color: rgb(104, 101, 101);
   margin-bottom: 0;
+}
+
+#part-1 {
+  padding-bottom: 25px;
+}
+
+#border {
+  border-bottom: 1px solid #367f8f;
+  width: 20%;
+  margin: 0 auto;
+}
+
+#part-2 {
+  padding-top: 25px;
+}
+
+form {
+  padding-top: 25px;
 }
